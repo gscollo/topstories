@@ -2,17 +2,17 @@
 Implementazione di un servizio REST che aggrega le top stories di news.ycombinator. com e le top stories della sezione di tecnolgia del New York Times.
 
 # REQUISITI
-- Java reqired version: 1.8
-- Apache Maven reqired version: 3.3.3
+- JDK required version: 1.8
+- Apache Maven required version: 3.3.3
 - internet connection
 
 # COMPILAZIONE ED ESECUZIONE
 Utilizzando la shell o prompt, muoviti dentro la directory del progetto ed esegui il comando:
-mvn clean install
+ "mvn clean install"
 
 Il progetto è compilato ed è stato creato il jar nella directory "target".
 Adesso lancia l'applicazione utilizzando il comando:
-java -jar target\topstories-0.0.1.jar
+ "java -jar target\topstories-0.0.1.jar"
 
 
 # REST URLs
