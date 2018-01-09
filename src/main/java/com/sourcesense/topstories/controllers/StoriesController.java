@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +29,11 @@ public class StoriesController {
 	private static final String HACKERS_NEWS_API_TEMPLATE_STORY = "https://hacker-news.firebaseio.com/v0/item/%s.json?print=pretty";
 	
 	/**
-	 * NEWS_LIMIT = 30
+	 * NEWS_LIMIT = check the property topstories.limit<br>
+	 * default = 30
 	 */
-	private static final int NEWS_LIMIT = 30;
+	@Value("${topstories.limit:30}")
+	private int newsLimit;
 
 	private static final Logger log = LoggerFactory.getLogger(StoriesController.class);
 	
@@ -52,7 +55,7 @@ public class StoriesController {
 	
 	/**
 	 * Top stories from news.ycombinator.com API, ordered by time.
-	 * <p> This stories are limited to the first  {@link StoriesController#NEWS_LIMIT}}
+	 * <p> This stories are limited to the first  {@link StoriesController#newsLimit}}
 	 * @return
 	 */
 	@RequestMapping(value="/news/hacker-news", method=RequestMethod.GET)
@@ -61,7 +64,7 @@ public class StoriesController {
     	log.info("hacker-news results: " + hnResults.size());
     	List<HNStory> result = hnResults.stream()
     			.map(x -> getHNStory(x))
-    			.limit(hnResults.size() > NEWS_LIMIT? NEWS_LIMIT : hnResults.size())
+    			.limit(hnResults.size() > newsLimit? newsLimit : hnResults.size())
     			.sorted((s1, s2) -> Long.valueOf(s2.getTime()).compareTo(s1.getTime()))
     			.collect(Collectors.toList());
 		
@@ -70,7 +73,7 @@ public class StoriesController {
 
 	/**
 	 * Top stories of technology from New York Times and news.ycombinator.com API, ordered by time
-	 * <p> This stories are limited to the first  {@link StoriesController#NEWS_LIMIT}} for each API
+	 * <p> This stories are limited to the first  {@link StoriesController#newsLimit}} for each API
 	 * @return List
 	 */
     @RequestMapping(value="/news", method=RequestMethod.GET)
@@ -81,14 +84,14 @@ public class StoriesController {
     	
     	List<Story> result = nyResult.getResults().stream()
     		.map(nytStory -> new Story(nytStory))
-    		.limit(nyResult.getResults().size() > NEWS_LIMIT? NEWS_LIMIT : nyResult.getResults().size())
+    		.limit(nyResult.getResults().size() > newsLimit? newsLimit : nyResult.getResults().size())
     		.collect(Collectors.toList());
     	
     	List<Integer> hnResults = getHNResults();
     	log.info("hacker-news results: " + hnResults.size());
     	result.addAll(hnResults.stream()
     			.map(x -> new Story(getHNStory(x)))
-    			.limit(hnResults.size() > NEWS_LIMIT? NEWS_LIMIT : hnResults.size())
+    			//.limit(hnResults.size() > newsLimit? newsLimit : hnResults.size())
     			.collect(Collectors.toList()));
     	
     	log.info("result before ordering... " + result.size());
