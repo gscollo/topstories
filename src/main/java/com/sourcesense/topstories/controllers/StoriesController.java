@@ -18,7 +18,7 @@ import com.sourcesense.topstories.bean.NYStory;
 import com.sourcesense.topstories.bean.Story;
 
 /**
- * REST service that attaches news from New York Times and news.ycombinator.com
+ * REST service that attaches news from New York Times (technology section) and news.ycombinator.com
  * @author G. Scollo
  */
 @RestController
@@ -61,7 +61,7 @@ public class StoriesController {
 	@RequestMapping(value="/news/hacker-news", method=RequestMethod.GET)
     public List<HNStory> hnTopstories() {
 		List<Integer> hnResults = getHNResults();
-    	log.info("hacker-news results: " + hnResults.size());
+    	log.info(String.format("hacker-news results: %s; limit: %s", hnResults.size(), newsLimit));
     	List<HNStory> result = hnResults.stream()
     			.map(x -> getHNStory(x))
     			.limit(hnResults.size() > newsLimit? newsLimit : hnResults.size())
@@ -84,14 +84,14 @@ public class StoriesController {
     	
     	List<Story> result = nyResult.getResults().stream()
     		.map(nytStory -> new Story(nytStory))
-    		.limit(nyResult.getResults().size() > newsLimit? newsLimit : nyResult.getResults().size())
+    		//.limit(nyResult.getResults().size() > newsLimit? newsLimit : nyResult.getResults().size())
     		.collect(Collectors.toList());
     	
     	List<Integer> hnResults = getHNResults();
-    	log.info("hacker-news results: " + hnResults.size());
+    	log.info(String.format("hacker-news results: %s; limit: %s", hnResults.size(), newsLimit));
     	result.addAll(hnResults.stream()
     			.map(x -> new Story(getHNStory(x)))
-    			//.limit(hnResults.size() > newsLimit? newsLimit : hnResults.size())
+    			.limit(hnResults.size() > newsLimit? newsLimit : hnResults.size())
     			.collect(Collectors.toList()));
     	
     	log.info("result before ordering... " + result.size());
